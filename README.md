@@ -15,3 +15,9 @@ The microservices include (all written in Go):
 - A **mail** service, which takes a JSON payload, converts it into a formatted email, and sends it out
 
 This is a code-along project to this Udemy Course: [Working with Microservices in Go (Golang)](https://www.udemy.com/course/working-with-microservices-in-go/)
+
+# Running project
+## Using make
+```bash
+make up_build
+```

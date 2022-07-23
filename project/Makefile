@@ -1,5 +1,5 @@
 SHELL=cmd.exe
-FRONT_END_BINARY=frontApp.exe
+FRONT_END_BINARY=frontApp
 BROKER_BINARY=brokerApp
 
 ## up: starts all containers in the background without forcing build
@@ -28,10 +28,10 @@ build_broker:
 	chdir ..\broker-service && set GOOS=linux&& set GOARCH=amd64&& set CGO_ENABLED=0 && go build -o ${BROKER_BINARY} ./cmd/api
 	@echo Done!
 
-## build_front: builds the frone end binary
+## build_front: builds the front end binary
 build_front:
 	@echo Building front end binary...
-	chdir ..\front-end && set CGO_ENABLED=0&& set GOOS=windows&& go build -o ${FRONT_END_BINARY} ./cmd/web
+	chdir ..\front-end && set GOOS=linux&& set GOARCH=amd64&& set CGO_ENABLED=0 && go build -o ${FRONT_END_BINARY} ./cmd/web
 	@echo Done!
 
 ## start: starts the front end
