@@ -1,3 +1,5 @@
 *exe
 brokerApp
-frontApp
+frontApp*
+authApp
+db-data/

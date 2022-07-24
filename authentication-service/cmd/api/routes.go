@@ -10,9 +10,9 @@ import (
 
 
 func (app *Config) routes() http.Handler {
-	mux := chi.NewRouter()
-
-	mux.Use(cors.Handler(cors.Options{
+	router := chi.NewRouter()
+	
+	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"https://*", "http://*"},
 		AllowedMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
@@ -21,11 +21,9 @@ func (app *Config) routes() http.Handler {
 		MaxAge:             300,
 	}))
 
-	mux.Use(middleware.Heartbeat(("/ping")))
+	router.Use(middleware.Heartbeat(("/ping")))
 
-	mux.Post("/", app.Broker)
+	router.Post("/authenticate", app.Authenticate)
 
-	mux.Post("/handle", app.HandleSubmission)
-
-	return mux
+	return router
 }

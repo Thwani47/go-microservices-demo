@@ -21,3 +21,9 @@ This is a code-along project to this Udemy Course: [Working with Microservices i
 ```bash
 make up_build
 ```
+## Using Docker Compose
+```powershell
+$>  cd project
+$> docker compose down 
+$> docker-compose up --build -d
+```
