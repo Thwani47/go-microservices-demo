@@ -2,4 +2,6 @@
 brokerApp
 frontApp*
 authApp
+loggerServiceApp
 db-data/
+.idea
