@@ -3,5 +3,6 @@ brokerApp
 frontApp*
 authApp
 loggerServiceApp
+mailServiceApp
 db-data/
 .idea
