@@ -4,5 +4,6 @@ frontApp*
 authApp
 loggerServiceApp
 mailServiceApp
+listenerApp
 db-data/
 .idea

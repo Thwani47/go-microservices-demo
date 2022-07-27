@@ -1,10 +1,10 @@
 package main
 
 import (
+	"broker/event"
 	"bytes"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 )
 
@@ -55,7 +55,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
-		app.logItem(w, requestPayload.Log)
+		app.logEventViaRabbit(w, requestPayload.Log)
 	case "mail":
 		app.sendMail(w, requestPayload.Mail)
 	default:
@@ -65,8 +65,6 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 
 func (app *Config) sendMail(w http.ResponseWriter, message MailPayload) {
 	jsonData, _ := json.MarshalIndent(message, "", "\t")
-
-	log.Println(jsonData)
 
 	mailServiceUrl := "http://mail-service/send"
 
@@ -81,14 +79,11 @@ func (app *Config) sendMail(w http.ResponseWriter, message MailPayload) {
 
 	client := &http.Client{}
 	response, err := client.Do(request)
-	log.Println(response)
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 	defer response.Body.Close()
-
-	log.Println("response", response)
 	if response.StatusCode != http.StatusAccepted {
 		app.errorJSON(w, errors.New("error calling mail service"))
 		return
@@ -186,4 +181,39 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 	payload.Data = jsonFromService.Data
 
 	app.writeJson(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) logEventViaRabbit(w http.ResponseWriter, l LogPayload) {
+	err := app.pushToQueue(l.Name, l.Data)
+
+	if err != nil {
+		app.errorJSON(w, err)
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "logged via RabbitMQ"
+	app.writeJson(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) pushToQueue(name, message string) error {
+	emitter, err := event.NewEventEmitter(app.RabbitMQ)
+
+	if err != nil {
+		return err
+	}
+
+	payload := LogPayload{
+		Name: name,
+		Data: message,
+	}
+
+	j, _ := json.MarshalIndent(&payload, "", "\t")
+
+	err = emitter.Push(string(j), "log.info")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
